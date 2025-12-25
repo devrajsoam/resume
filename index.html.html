@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMR Enterprise | Build My Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        [x-cloak] { display: none !important; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #ffffff; }
+        
+        .dot-bg {
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .is-round .cropper-view-box, .is-round .cropper-face { border-radius: 50% !important; }
+        
+        @media print {
+            .no-print { display: none !important; }
+            .resume-page { box-shadow: none !important; border: 1px solid #eee !important; margin: 0 !important; width: 100% !important; }
+        }
+    </style>
+</head>
+<body x-data="bmrEngine()" class="dot-bg">
+
+    <template x-if="view === 'home'">
+        <div class="min-h-screen flex flex-col items-center justify-center p-6">
+            <div class="max-w-5xl w-full bg-white rounded-[3rem] shadow-[0_32px_64px_-15px_rgba(0,0,0,0.1)] p-12 border border-slate-100 relative overflow-hidden">
+                <div class="text-center mb-16">
+                    <h1 class="text-8xl font-black italic tracking-tighter text-slate-900">BMR</h1>
+                    <p class="text-indigo-600 font-bold tracking-[0.4em] text-xs uppercase mt-2">Enterprise Resume Logic System</p>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-8">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-slate-800 mb-4 italic">The BMR Solution</h2>
+                            <p class="text-slate-500 text-sm leading-relaxed mb-6 font-medium">BMR solves the industry problem of misaligned academic timelines and non-standardized career formatting for students of <strong>Vinayak Vidyapeeth</strong>.</p>
+                            <ul class="grid grid-cols-1 gap-3">
+                                <li class="flex items-center text-sm font-bold text-slate-600"><i class="fas fa-check text-indigo-500 mr-3"></i> Automated Academic Timelining</li>
+                                <li class="flex items-center text-sm font-bold text-slate-600"><i class="fas fa-check text-indigo-500 mr-3"></i> Dual-Mode Image Processing</li>
+                                <li class="flex items-center text-sm font-bold text-slate-600"><i class="fas fa-check text-indigo-500 mr-3"></i> Conditional Career Branching</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="flex gap-4 border-t pt-8">
+                            <div class="bg-slate-50 p-4 rounded-2xl flex-1">
+                                <p class="text-[10px] font-black text-indigo-500 uppercase">Makers</p>
+                                <p class="text-xs font-bold text-slate-700">Devraj, Sanjana, Ketan</p>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-2xl flex-1">
+                                <p class="text-[10px] font-black text-indigo-500 uppercase">Affiliation</p>
+                                <p class="text-xs font-bold text-slate-700">CCSU / Vinayak Vidyapeeth</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-600 rounded-[2.5rem] p-10 text-white shadow-2xl shadow-indigo-200">
+                        <h3 class="text-xl font-bold mb-6">Ready to build?</h3>
+                        <p class="text-indigo-100 text-sm mb-8 font-medium">Click below to start the step-by-step intelligence engine. Your data is processed locally for maximum privacy.</p>
+                        <button @click="view = 'builder'" class="w-full py-5 bg-white text-indigo-600 rounded-2xl font-black text-lg hover:scale-[1.02] transition-transform">LAUNCH BUILDER</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template x-if="view === 'builder'">
+        <div class="min-h-screen pt-20">
+            <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b h-16 flex items-center px-6 no-print">
+                <div class="max-w-4xl mx-auto w-full flex justify-between items-center">
+                    <span class="font-black text-indigo-600 italic cursor-pointer" @click="view = 'home'">BMR ENGINE</span>
+                    <div class="flex items-center gap-4">
+                        <span class="text-[10px] font-black text-slate-400 uppercase" x-text="`Step ${currentSection + 1}/${questions.length}`"></span>
+                        <button @click="view = 'preview'" class="bg-slate-900 text-white px-5 py-2 rounded-full text-[10px] font-black uppercase">Preview</button>
+                    </div>
+                </div>
+            </nav>
+
+            <main class="max-w-xl mx-auto px-4 py-10">
+                <div class="bg-white rounded-[2.5rem] p-10 shadow-2xl border border-slate-100 min-h-[500px] flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-900 mb-8 tracking-tight" x-text="questions[currentSection].text"></h2>
+
+                        <template x-if="questions[currentSection].type === 'image'">
+                            <div class="flex flex-col items-center">
+                                <div class="relative group cursor-pointer" @click="triggerUpload">
+                                    <img :src="profileImage || 'https://ui-avatars.com/api/?name=?&background=f8fafc&color=cbd5e1'" 
+                                         :class="cropShape === 'round' ? 'rounded-full' : 'rounded-3xl'"
+                                         class="w-44 h-44 object-cover border-8 border-slate-50 shadow-inner group-hover:brightness-95 transition-all">
+                                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"><i class="fas fa-camera text-slate-400 text-2xl"></i></div>
+                                </div>
+                                <input type="file" id="fileInput" class="hidden" @change="handleFileUpload" accept="image/*">
+                                <p class="text-[10px] font-black text-slate-400 uppercase mt-6">Click icon to upload photo</p>
+                            </div>
+                        </template>
+
+                        <template x-if="questions[currentSection].type === 'input'">
+                            <input type="text" x-model="formData[questions[currentSection].key]" @input="validateField()"
+                                   :placeholder="questions[currentSection].placeholder"
+                                   class="w-full p-6 bg-slate-50 rounded-2xl border-none ring-2 ring-slate-100 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-lg transition-all">
+                        </template>
+
+                        <template x-if="questions[currentSection].type === 'tiles'">
+                            <div class="grid gap-3">
+                                <template x-for="opt in questions[currentSection].options">
+                                    <button @click="handleSelection(opt)" 
+                                            :class="formData[questions[currentSection].key] === opt ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-50 text-slate-600'"
+                                            class="w-full p-5 text-left font-bold rounded-2xl transition-all border border-transparent hover:border-indigo-100" x-text="opt"></button>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="mt-12 flex justify-between items-center">
+                        <button @click="prev()" :class="currentSection === 0 ? 'invisible' : ''" class="text-xs font-black text-slate-300 uppercase">Back</button>
+                        <button @click="next()" class="bg-indigo-600 text-white px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 transition-transform">Next</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </template>
+
+    <div x-show="showCropModal" x-cloak class="fixed inset-0 z-[100] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full">
+            <h3 class="text-center font-black text-xs uppercase mb-6">Crop Your Photo</h3>
+            <div class="overflow-hidden rounded-2xl bg-slate-100 mb-6" :class="cropShape === 'round' ? 'is-round' : ''">
+                <img id="cropImage" src="" class="block max-w-full">
+            </div>
+            <div class="flex justify-center gap-10 mb-8">
+                <button @click="setCropShape('square')" :class="cropShape === 'square' ? 'text-indigo-600 scale-125' : 'text-slate-300'"><i class="fas fa-square fa-2x"></i></button>
+                <button @click="setCropShape('round')" :class="cropShape === 'round' ? 'text-indigo-600 scale-125' : 'text-slate-300'"><i class="fas fa-circle fa-2x"></i></button>
+            </div>
+            <button @click="saveCrop()" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-black text-xs uppercase shadow-lg shadow-indigo-200">Apply Changes</button>
+        </div>
+    </div>
+
+    <template x-if="view === 'preview'">
+        <div class="min-h-screen bg-slate-50 py-10 px-4">
+            <div class="max-w-4xl mx-auto no-print mb-8 flex justify-between">
+                <button @click="view = 'builder'" class="bg-white px-6 py-2 rounded-xl font-bold text-xs border">Back to Edit</button>
+                <button onclick="window.print()" class="bg-slate-900 text-white px-8 py-2 rounded-xl font-bold text-xs shadow-xl">Print to PDF</button>
+            </div>
+
+            <div class="resume-page max-w-[800px] mx-auto bg-white p-12 min-h-[1050px] shadow-2xl border-t-[16px] border-slate-900">
+                <div class="flex justify-between items-start border-b pb-10">
+                    <div>
+                        <h1 class="text-5xl font-black text-slate-900 uppercase tracking-tighter" x-text="formData.name || 'YOUR NAME'"></h1>
+                        <div class="mt-8 grid grid-cols-2 gap-y-3 gap-x-12 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                            <p><i class="fas fa-envelope mr-3 text-indigo-500"></i> <span x-text="formData.email"></span></p>
+                            <p><i class="fas fa-phone mr-3 text-indigo-500"></i> <span x-text="formData.phone"></span></p>
+                            <p><i class="fab fa-linkedin mr-3 text-indigo-500"></i> <span x-text="formData.linkedin"></span></p>
+                            <p><i class="fab fa-github mr-3 text-indigo-500"></i> <span x-text="formData.github"></span></p>
+                        </div>
+                    </div>
+                    <img x-show="profileImage" :src="profileImage" :class="cropShape === 'round' ? 'rounded-full' : 'rounded-xl'" class="w-36 h-36 object-cover border-4 border-slate-50 shadow-md">
+                </div>
+
+                <div class="mt-12">
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6 border-b pb-2">Academic History</h3>
+                    <div class="space-y-6">
+                        <template x-if="formData.pg_college">
+                            <div class="flex justify-between items-center">
+                                <div><p class="text-sm font-bold text-slate-800" x-text="formData.pg_college"></p><p class="text-[10px] text-slate-400 font-bold uppercase">Post Graduation</p></div>
+                                <p class="text-xs font-black text-slate-900" x-text="formData.pg_year"></p>
+                            </div>
+                        </template>
+                        <div class="flex justify-between items-center">
+                            <div><p class="text-sm font-bold text-slate-800" x-text="formData.grad_college"></p><p class="text-[10px] text-slate-400 font-bold uppercase">Graduation</p></div>
+                            <p class="text-xs font-black text-slate-900" x-text="formData.grad_year"></p>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div><p class="text-sm font-bold text-slate-800" x-text="formData.school_12"></p><p class="text-[10px] text-slate-400 font-bold uppercase">Higher Secondary (12th)</p></div>
+                            <p class="text-xs font-black text-slate-900" x-text="formData.year_12"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12">
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6 border-b pb-2">Professional Experience</h3>
+                    <template x-if="formData.exp_type === 'I am a Fresher'">
+                        <p class="text-sm font-bold text-slate-400 italic">Entry Level / Professional Fresher</p>
+                    </template>
+                    <template x-if="formData.exp_type === 'Yes, add experience'">
+                        <div class="bg-slate-50 p-6 rounded-2xl">
+                            <p class="text-sm font-black text-slate-900 uppercase" x-text="formData.comp_name"></p>
+                            <p class="text-xs font-bold text-indigo-600 mt-1 uppercase" x-text="formData.designation"></p>
+                            <p class="text-[10px] font-bold text-slate-400 mt-4 uppercase" x-text="`${formData.from_date} — ${formData.to_date}`"></p>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="mt-20 pt-10 border-t flex justify-between items-center opacity-40 grayscale">
+                    <p class="text-[9px] font-black">BMR ENTERPRISE BUILDER V1.0</p>
+                    <p class="text-[9px] font-black uppercase">Vinayak Vidyapeeth Engineering</p>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        function bmrEngine() {
+            return {
+                view: 'home', currentSection: 0, error: '', profileImage: null, showCropModal: false, cropShape: 'square', cropper: null,
+                formData: { name: '', email: '', phone: '', linkedin: '', github: '', school_10: '', year_10: '', school_12: '', year_12: '', grad_college: '', grad_year: '', pg_college: '', pg_year: '', exp_type: '', comp_name: '', designation: '', from_date: '', to_date: '' },
+                
+                get questions() {
+                    let qs = [
+                        { key: 'photo', text: "Upload Profile Photo", type: 'image' },
+                        { key: 'name', text: "Full Name", type: 'input', placeholder: 'e.g. Ketan Kumar' },
+                        { key: 'email', text: "Email Address", type: 'input' },
+                        { key: 'phone', text: "Phone Number", type: 'input' },
+                        { key: 'linkedin', text: "LinkedIn URL", type: 'input' },
+                        { key: 'github', text: "GitHub URL", type: 'input' },
+                        { key: 'school_12', text: "12th School Name", type: 'input' },
+                        { key: 'year_12', text: "12th Pass Date", type: 'input' },
+                        { key: 'grad_college', text: "Graduation College", type: 'input' },
+                        { key: 'grad_year', text: "Graduation Pass Year", type: 'input' },
+                        { key: 'pg_college', text: "PG College (or Skip)", type: 'input' },
+                        { key: 'pg_year', text: "PG Pass Year", type: 'input' },
+                        { key: 'exp_type', text: "Experience Status", type: 'tiles', options: ['I am a Fresher', 'Yes, add experience'] }
+                    ];
+                    if (this.formData.exp_type === 'Yes, add experience') {
+                        qs.push(
+                            { key: 'comp_name', text: "Company Name", type: 'input' },
+                            { key: 'designation', text: "Designation", type: 'input' },
+                            { key: 'from_date', text: "From Date", type: 'input' },
+                            { key: 'to_date', text: "To Date", type: 'input' }
+                        );
+                    }
+                    return qs;
+                },
+
+                handleSelection(val) {
+                    this.formData[this.questions[this.currentSection].key] = val;
+                    this.next();
+                },
+
+                next() {
+                    if (this.currentSection < this.questions.length - 1) this.currentSection++;
+                    else this.view = 'preview';
+                },
+
+                prev() { if (this.currentSection > 0) this.currentSection--; },
+
+                triggerUpload() { document.getElementById('fileInput').click(); },
+
+                handleFileUpload(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        this.showCropModal = true;
+                        this.$nextTick(() => {
+                            const imgElement = document.getElementById('cropImage');
+                            imgElement.src = event.target.result;
+                            if (this.cropper) this.cropper.destroy();
+                            this.cropper = new Cropper(imgElement, {
+                                aspectRatio: 1,
+                                viewMode: 1,
+                                background: false
+                            });
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                },
+
+                setCropShape(shape) {
+                    this.cropShape = shape;
+                    // Force refresh cropper view
+                    const canvasData = this.cropper.getCanvasData();
+                    this.cropper.destroy();
+                    this.cropper = new Cropper(document.getElementById('cropImage'), {
+                        aspectRatio: 1,
+                        viewMode: 1
+                    });
+                },
+
+                saveCrop() {
+                    this.profileImage = this.cropper.getCroppedCanvas({ width: 400, height: 400 }).toDataURL();
+                    this.showCropModal = false;
+                    this.next();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
